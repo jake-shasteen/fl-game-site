@@ -1,0 +1,24 @@
+footer {
+    width: 100%;
+    max-width: 1024px;
+    margin: 0 auto;
+    border: 1px solid red;
+    box-shadow: 0px 0px 5px red, inset 0px 0px 2px red;
+    align-self: end;
+}
+
+footer nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center;
+    height: 100%;
+}
+
+footer nav > * {
+    flex: 1 0 0;
+    display: inline;
+}
+
+footer nav h2 {
+    font-size: 1rem;
+}

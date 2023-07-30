@@ -1,0 +1,32 @@
+header {
+    display: inline-flex;
+    flex-wrap: wrap;
+    flex: 1;
+    align-self: start;
+    flex-direction: column;
+}
+
+header nav {
+    flex: 1;
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: column;
+}
+
+@media screen and (min-width: 768px) {
+    header {
+        flex-direction: row;
+    }
+    header nav {
+        flex-direction: row;
+    }
+}
+
+header h1 {
+    padding-right: 2rem;
+}
+
+header nav > * {
+    flex-grow: 1;
+}
