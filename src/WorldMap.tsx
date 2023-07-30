@@ -1,4 +1,4 @@
-import baseworldmap from '../public/baseworldmap.webp'
+import baseworldmap from '../src/baseworldmap.webp'
 import './WorldMap.css'
 
 function WorldMap() {
