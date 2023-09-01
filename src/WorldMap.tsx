@@ -6,13 +6,9 @@ function WorldMap() {
     return (
         <>
             <h2>World Map</h2>
-            <Hexify>
-                <img src={baseworldmap} />
-            </Hexify>
-            <h3>Copenhagen</h3>
-            <h3>Hamburg</h3>
-            <h3>Berlin</h3>
-            <h3>Prague</h3>
+            <Hexify url={baseworldmap}></Hexify>
+            <h3>Place 1</h3>
+            <h3>Place 2</h3>
         </>
     )
 }
