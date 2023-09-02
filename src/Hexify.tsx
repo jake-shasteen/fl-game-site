@@ -3,7 +3,8 @@ import * as d3 from 'd3'
 import { hexbin as Hexbin } from 'd3-hexbin'
 
 import worldmap from './assets/ravenland-worldmap.png'
-
+/* const worldmap =
+    'https://fastly.picsum.photos/id/325/200/300.jpg?hmac=Msn1Ui614fNi6HvLNovytf3IQx4fpJrJYRz59dR6TFQ' */
 const NUM_HEXES_ACROSS = 40
 /**
  * Take an image element as a child
@@ -56,6 +57,7 @@ function Hexify({ children }: PropsWithChildren) {
 
     const centers = hexbin.centers().filter(([x, y]) => x < width && y < height)
     const hexagon = hexbin.hexagon()
+    console.log({ width, height, hexRadius, centersLength: centers.length })
     return (
         <svg
             id="mySvg"
@@ -86,8 +88,8 @@ function Hexify({ children }: PropsWithChildren) {
                         <rect
                             x={x}
                             y={y}
-                            height="1.2rem"
-                            width="2rem"
+                            height={hexRadius / 2}
+                            width={hexRadius}
                             fill={`rgba(255,255,255,.2)`}
                             transform={`translate(-${hexRadius / 2},-${
                                 14 + hexRadius / 2
@@ -96,9 +98,9 @@ function Hexify({ children }: PropsWithChildren) {
                         <text
                             x={x}
                             y={y}
-                            style={{
-                                font: 'italic 1rem sans-serif',
-                            }}
+                            fontStyle="italic"
+                            fontFamily="sans-serif"
+                            fontSize={`${hexRadius / 3}px`}
                             transform={`translate(-${hexRadius / 2},-${
                                 hexRadius / 2
                             })`}
