@@ -1,15 +1,13 @@
-import { useEffect, useState, PropsWithChildren, Children } from 'react'
+import { useEffect, useState, PropsWithChildren, Fragment } from 'react'
 import * as d3 from 'd3'
 import { hexbin as Hexbin } from 'd3-hexbin'
 
-const hexbin = Hexbin()
-    .extent([
-        [0, 0],
-        [100, 50],
-    ])
-    .radius(2)
+import worldmap from './assets/ravenland-worldmap.png'
 
-const centers = hexbin.centers()
+const STATIC_WIDTH = 300
+const STATIC_HEIGHT = 150
+const HEX_RADIUS = 4
+
 /**
  * Take an image element as a child
  * Then draw a hex map over it
@@ -22,70 +20,73 @@ function Hexify({ children }: PropsWithChildren) {
         const context = canvas.getContext('2d')
 
         img.onload = () => {
-            context?.drawImage(img, 0, 0)
+            context?.drawImage(img, 0, 0, STATIC_WIDTH, STATIC_HEIGHT)
             setImageData(
-                canvas.getContext('2d')?.getImageData(0, 0, 100, 50).data
+                canvas
+                    .getContext('2d')
+                    ?.getImageData(0, 0, STATIC_WIDTH, STATIC_HEIGHT).data
             )
         }
-
         img.crossOrigin = 'Anonymous'
-        img.src =
-            'https://fastly.picsum.photos/id/325/200/300.jpg?hmac=Msn1Ui614fNi6HvLNovytf3IQx4fpJrJYRz59dR6TFQ'
-        document.getElementById('mySvg')?.parentElement?.append(canvas)
+        img.src = worldmap
     }, [])
 
+    const hexbin = Hexbin()
+        .extent([
+            [0, 0],
+            [STATIC_WIDTH, STATIC_HEIGHT],
+        ])
+        .radius(HEX_RADIUS)
+
+    const centers = hexbin.centers()
+    const hexagon = hexbin.hexagon()
+    console.log(imageData?.filter((x) => x == 0).length)
     return (
         <svg
             id="mySvg"
-            viewBox="0 0 100 50"
+            viewBox={`0 0 ${STATIC_WIDTH} ${STATIC_HEIGHT}`}
             style={{
                 border: '2px solid black',
             }}
         >
             {centers.map(([x, y], i) => {
-                console.log(imageData?.filter((x) => x > 0).length)
+                const tgt = 4 * (Math.floor(x) + Math.floor(y) * STATIC_WIDTH)
                 return (
-                    <path
-                        key={i}
-                        transform={'translate(' + x + ',' + y + ')'}
-                        d={hexbin.hexagon()}
-                        fill={
-                            imageData
-                                ? 'rgb(' +
-                                  imageData[
-                                      4 * (Math.floor(y) * 100 + Math.floor(x))
-                                  ] +
-                                  ',' +
-                                  imageData[
-                                      4 *
-                                          (Math.floor(y) * 100 +
-                                              Math.floor(x)) +
-                                          1
-                                  ] +
-                                  ',' +
-                                  imageData[
-                                      4 *
-                                          (Math.floor(y) * 100 +
-                                              Math.floor(x)) +
-                                          2
-                                  ] +
-                                  ',' +
-                                  imageData[
-                                      4 *
-                                          (Math.floor(y) * 100 +
-                                              Math.floor(x)) +
-                                          3
-                                  ] +
-                                  ')'
-                                : 'red'
-                        }
-                        stroke="black"
-                        strokeWidth=".01"
-                    />
+                    <Fragment key={i}>
+                        <path
+                            transform={`translate(${x},${y})`}
+                            d={hexagon}
+                            stroke="black"
+                            strokeWidth=".05"
+                            fill={
+                                imageData
+                                    ? `rgba(${imageData[tgt]},${
+                                          imageData[tgt + 1]
+                                      },${imageData[tgt + 2]},${
+                                          imageData[tgt + 3]
+                                      })`
+                                    : 'red'
+                            }
+                        />
+                        <text
+                            x={x}
+                            y={y}
+                            style={{
+                                font: 'italic 5% sans-serif',
+                            }}
+                            transform={`translate(-${HEX_RADIUS / 2},-${
+                                HEX_RADIUS / 2
+                            })`}
+                        >
+                            {`${
+                                'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[Math.floor(i / 44)]
+                            }${Math.floor(i % 44)}`}
+                        </text>
+                    </Fragment>
                 )
             })}
         </svg>
     )
 }
-
+// TODO: Calculate correct wrapping, instead of using 44
 export default Hexify
