@@ -56,7 +56,6 @@ function Hexify({ children }: PropsWithChildren) {
 
     const centers = hexbin.centers().filter(([x, y]) => x < width && y < height)
     const hexagon = hexbin.hexagon()
-    console.log(imageData?.filter((x) => x == 0).length)
     return (
         <svg
             id="mySvg"
@@ -84,6 +83,16 @@ function Hexify({ children }: PropsWithChildren) {
                                     : 'red'
                             }
                         />
+                        <rect
+                            x={x}
+                            y={y}
+                            height="1.2rem"
+                            width="2rem"
+                            fill={`rgba(255,255,255,.2)`}
+                            transform={`translate(-${hexRadius / 2},-${
+                                14 + hexRadius / 2
+                            })`}
+                        />
                         <text
                             x={x}
                             y={y}
@@ -95,7 +104,7 @@ function Hexify({ children }: PropsWithChildren) {
                             })`}
                         >
                             {`${
-                                'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'[
+                                '_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'[
                                     Math.floor(i / (NUM_HEXES_ACROSS + 0.5))
                                 ]
                             }${Math.floor((i % (NUM_HEXES_ACROSS + 0.5)) + 1)}`}
