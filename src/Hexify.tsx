@@ -4,55 +4,69 @@ import { hexbin as Hexbin } from 'd3-hexbin'
 
 import worldmap from './assets/ravenland-worldmap.png'
 
-const STATIC_WIDTH = 300
-const STATIC_HEIGHT = 220
-const HEX_RADIUS = 4
-
+const NUM_HEXES_ACROSS = 40
 /**
  * Take an image element as a child
  * Then draw a hex map over it
  **/
 function Hexify({ children }: PropsWithChildren) {
     const [imageData, setImageData] = useState<Uint8ClampedArray>()
+    const [width, setWidth] = useState<number>(0)
+    const [height, setHeight] = useState<number>(0)
+    const [hexRadius, setHexRadius] = useState<number>(4)
+
     useEffect(() => {
         const img = new Image()
         const canvas = document.createElement('canvas')
-        canvas.width = STATIC_WIDTH
-        canvas.height = STATIC_HEIGHT
-        const context = canvas.getContext('2d')
 
         img.onload = () => {
-            context?.drawImage(img, 0, 0, STATIC_WIDTH, STATIC_HEIGHT)
+            setHeight(img.naturalHeight)
+            setWidth(img.naturalWidth)
+            // hexWidth = 2 * radius * sin(pi/3)
+            // numHexesAcross = width / hexWidth
+            // numHexesAcross = width / 2 * radius * sin(pi/3)
+            // width = numHexesAcross * 2 * radius * sin(pi/3)
+            // width / (numHexesAcross * 2 * sin(pi/3)) = radius
+            setHexRadius(
+                img.naturalWidth /
+                    (2 * NUM_HEXES_ACROSS * Math.sin(Math.PI / 3))
+            )
+            canvas.width = width
+            canvas.height = height
+            canvas.getContext('2d')?.drawImage(img, 0, 0, width, height)
+
             setImageData(
                 canvas
                     .getContext('2d')
-                    ?.getImageData(0, 0, STATIC_WIDTH, STATIC_HEIGHT).data
+                    ?.getImageData(0, 0, img.naturalWidth, img.naturalHeight)
+                    .data
             )
         }
+
         img.crossOrigin = 'Anonymous'
         img.src = worldmap
-    }, [])
+    }, [width, height])
 
     const hexbin = Hexbin()
         .extent([
             [0, 0],
-            [STATIC_WIDTH, STATIC_HEIGHT],
+            [width, height],
         ])
-        .radius(HEX_RADIUS)
+        .radius(hexRadius)
 
-    const centers = hexbin.centers()
+    const centers = hexbin.centers().filter(([x, y]) => x < width && y < height)
     const hexagon = hexbin.hexagon()
     console.log(imageData?.filter((x) => x == 0).length)
     return (
         <svg
             id="mySvg"
-            viewBox={`0 0 ${STATIC_WIDTH} ${STATIC_HEIGHT}`}
+            viewBox={`0 0 ${width} ${height}`}
             style={{
                 border: '2px solid black',
             }}
         >
             {centers.map(([x, y], i) => {
-                const tgt = 4 * (Math.floor(x) + Math.floor(y) * STATIC_WIDTH)
+                const tgt = 4 * (Math.floor(x) + Math.floor(y) * width)
                 return (
                     <Fragment key={i}>
                         <path
@@ -74,15 +88,17 @@ function Hexify({ children }: PropsWithChildren) {
                             x={x}
                             y={y}
                             style={{
-                                font: 'italic 5% sans-serif',
+                                font: 'italic 1rem sans-serif',
                             }}
-                            transform={`translate(-${HEX_RADIUS / 2},-${
-                                HEX_RADIUS / 2
+                            transform={`translate(-${hexRadius / 2},-${
+                                hexRadius / 2
                             })`}
                         >
                             {`${
-                                'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[Math.floor(i / 44)]
-                            }${Math.floor(i % 44)}`}
+                                'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'[
+                                    Math.floor(i / (NUM_HEXES_ACROSS + 0.5))
+                                ]
+                            }${Math.floor((i % (NUM_HEXES_ACROSS + 0.5)) + 1)}`}
                         </text>
                     </Fragment>
                 )
@@ -90,5 +106,4 @@ function Hexify({ children }: PropsWithChildren) {
         </svg>
     )
 }
-// TODO: Calculate correct wrapping, instead of using 44
 export default Hexify
