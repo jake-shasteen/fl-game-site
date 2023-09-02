@@ -5,7 +5,7 @@ import { hexbin as Hexbin } from 'd3-hexbin'
 import worldmap from './assets/ravenland-worldmap.png'
 
 const STATIC_WIDTH = 300
-const STATIC_HEIGHT = 150
+const STATIC_HEIGHT = 220
 const HEX_RADIUS = 4
 
 /**
@@ -17,6 +17,8 @@ function Hexify({ children }: PropsWithChildren) {
     useEffect(() => {
         const img = new Image()
         const canvas = document.createElement('canvas')
+        canvas.width = STATIC_WIDTH
+        canvas.height = STATIC_HEIGHT
         const context = canvas.getContext('2d')
 
         img.onload = () => {
